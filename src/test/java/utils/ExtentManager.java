@@ -16,7 +16,7 @@ public class ExtentManager {
         if (extent == null) {
 
             String timestamp = LocalDateTime.now()
-                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
+                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
 
             reportDir = "target/extent-reports/Run_" + timestamp;
 

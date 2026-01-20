@@ -8,10 +8,7 @@ public class ContactUsPage {
         PlaywrightDriver.click("contact.button");
     }
 
-    public boolean isContactButtonVisible() {
-        return PlaywrightDriver.isVisible(
-                PlaywrightDriver.getLocator("contact.button"));
-    }
+
 
 
 
@@ -22,37 +19,6 @@ public class ContactUsPage {
         PlaywrightDriver.log("Clicked Send button");
     }
 
-//    public boolean isSuccessMessageDisplayed(String expectedMessage) {
-//
-//        try {
-//            // Wait for success message to appear
-//            PlaywrightDriver.isVisible(
-//                    PlaywrightDriver.getLocator("contactUs.successMessage")
-//            );
-//
-//            // Get actual text from UI
-//            String actualMessage = PlaywrightDriver.getText(PlaywrightDriver.getLocator("contactUs.successMessage"));
-//
-//            // Compare with expected message from config
-//            return actualMessage.equals(expectedMessage);
-//
-//        } catch (Exception e) {
-//            return false;
-//        }
-//    }
-
-
-
-    // ================= NAVIGATION =================
-
-
-    public boolean isContactUsButtonClickable() {
-        return PlaywrightDriver.isClickable("contactus.button");
-    }
-
-//    public boolean isContactUsPageLoaded() {
-//        return PlaywrightDriver.getPage().url().contains("contact");
-//    }
 
     // ================= FIELD VISIBILITY =================
 
@@ -87,9 +53,6 @@ public class ContactUsPage {
         PlaywrightDriver.type("contact.message", message);
     }
 
-    public void clickSendMessageButton() {
-        PlaywrightDriver.click("contactus.send");
-    }
 
     // ================= VALIDATIONS =================
 
@@ -104,10 +67,6 @@ public class ContactUsPage {
 
     }
 
-    public boolean isInvalidNameErrorDisplayed() {
-        return PlaywrightDriver.isVisible("contact.invalid.name");
-    }
-
     public String getNameLengthErrorDisplayed() {
         return PlaywrightDriver.getText(("contact.error.message.forNamelengthvalidation"));
     }
@@ -117,12 +76,6 @@ public class ContactUsPage {
     }
 
 
-
-    // ================= TITLE =================
-
-//    public String getContactUsPageTitle() {
-//        return PlaywrightDriver.getTitle();
-//    }
 
 
     public boolean isContactUsPageOpened() {

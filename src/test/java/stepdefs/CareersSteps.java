@@ -1,13 +1,12 @@
 package stepdefs;
 
 import config.PlaywrightDriver;
-import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.*;
-import org.testng.Assert;
+
 import pages.CareersPage;
 import pages.JobApplicationPage;
 
-import java.util.List;
+
 
 public class CareersSteps {
 
@@ -30,18 +29,15 @@ public class CareersSteps {
         PlaywrightDriver.log("Actual URL: " + actualUrl);
         PlaywrightDriver.log("Expected URL: " + expectedUrl);
 
-        Assert.assertTrue(actualUrl.contains(expectedUrl),
-                "❌ Career page URL incorrect");
+        PlaywrightDriver.verifyTrue(actualUrl.contains(expectedUrl));
     }
 
     @Then("View Open Positions button should be visible")
     public void view_positions_button_should_be_visible() {
         PlaywrightDriver.log("Checking if View Open Positions button is visible");
 
-        Assert.assertTrue(
-                careersPage.isViewPositionsButtonVisible(),
-                "❌ View Positions button is not visible"
-        );
+       PlaywrightDriver.verifyTrue(
+                careersPage.isViewPositionsButtonVisible());
     }
 
     @When("user clicks on View Positions")
@@ -54,10 +50,8 @@ public class CareersSteps {
     public void verify_open_positions() {
         PlaywrightDriver.log("Verifying Open Positions section is visible");
 
-        Assert.assertTrue(
-                careersPage.isOpenPositionsVisible(),
-                "❌ Open Positions not visible"
-        );
+        PlaywrightDriver.verifyTrue(
+                careersPage.isOpenPositionsVisible());
     }
 
 
@@ -72,10 +66,8 @@ public class CareersSteps {
     public void verify_job_details_page() {
         PlaywrightDriver.log("Verifying Job Details page is loaded");
 
-        Assert.assertTrue(
-                jobPage.isApplyJobButtonVisible(),
-                "❌ Job details page not loaded"
-        );
+       PlaywrightDriver.verifyTrue(
+                jobPage.isApplyJobButtonVisible());
     }
 
     @When("user clicks on Apply Job")
@@ -94,7 +86,7 @@ public class CareersSteps {
     public void user_uploads_resume(String resumeFileName) {
 
         PlaywrightDriver.uploadResume("job.resume", resumeFileName);
-        PlaywrightDriver.log("User uploads resume file: " + resumeFileName);
+        PlaywrightDriver.log("User uploaded resume file: " + resumeFileName);
     }
 
     @When("user submits the job application")
@@ -108,11 +100,9 @@ public class CareersSteps {
     public void check_confirmation_msg(String expectedSuccessMsg) {
         PlaywrightDriver.log("Expected  Msg  "+expectedSuccessMsg);
         PlaywrightDriver.log("Actual  Message "+jobPage.getMessageforJobApplicationSuccess());
-        Assert.assertEquals(
+        PlaywrightDriver.verifyText(
                 jobPage.getMessageforJobApplicationSuccess(),
-                expectedSuccessMsg,
-                "❌ Success message mismatch"
-        );
+                expectedSuccessMsg);
 
     }
 
@@ -125,10 +115,9 @@ public class CareersSteps {
         PlaywrightDriver.log("Expected error: " + expectederrorforinvalidresume);
         PlaywrightDriver.log("Actual error: " + jobPage.getResumeErrorDisplayed());
 
-        Assert.assertEquals(
+        PlaywrightDriver.verifyText(
                 jobPage.getResumeErrorDisplayed(),
-                expectederrorforinvalidresume,
-                "❌ Resume error not displayed"
+                expectederrorforinvalidresume
         );
     }
 
@@ -136,9 +125,8 @@ public class CareersSteps {
     public void available_job_positions_should_be_displayed() {
         PlaywrightDriver.log("Verifying available job positions are displayed");
 
-        Assert.assertTrue(
-                careersPage.areJobPositionsDisplayed(),
-                "❌ Job positions are not displayed"
+        PlaywrightDriver.verifyTrue(
+                careersPage.areJobPositionsDisplayed()
         );
     }
 
@@ -149,23 +137,24 @@ public class CareersSteps {
         PlaywrightDriver.log("Expected error: " + expectedMessage);
         PlaywrightDriver.log("Actual error: " + careersPage.getResumeSizeErrorMessage());
 
-        Assert.assertEquals(
+       PlaywrightDriver.verifyText(
                 careersPage.getResumeSizeErrorMessage(),
-                expectedMessage,
-                "❌ Resume size error message mismatch"
+                expectedMessage
         );
     }
 
-    @Then("should display available job positions")
-    public void should_display_available_job_positions() {
-        List<String> jobs = CareersPage.getAvailableJobPositions();
+    @Then("should return available job positions")
+    public void should_return_available_job_positions() {
+        PlaywrightDriver.log("Available Job Positions: are" +CareersPage.getAvailableJobPositions() );
 
-        Assert.assertTrue(jobs.size() > 0, "No job positions found!");
-
-        PlaywrightDriver.log("Available Job Positions:");
-        for (String job : jobs) {
-            PlaywrightDriver.log(" - " + job);
-        }
     }
+
+    @Then("system should display {string} message")
+    public void system_should_display_no_jobs_message(String expectedMessage) {
+        String actualMessage = careersPage.getNoJobsMessage();
+        PlaywrightDriver.verifyText(actualMessage, expectedMessage);
+    }
+
+
 
 }

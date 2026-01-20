@@ -18,16 +18,7 @@ public class Hooks {
 
     @Before
     public void beforeScenario(Scenario scenario) {
-        // Load configs safely
-        PlaywrightDriver.loadConfig("config/aboutUs.properties");
-        PlaywrightDriver.loadConfig("config/contactUs.properties");
-        PlaywrightDriver.loadConfig("config/careers.properties");
 
-        // Load locators safely
-        PlaywrightDriver.loadLocators("Locators/aboutUsPage.properties");
-        PlaywrightDriver.loadLocators("Locators/contactUsPage.properties");
-        PlaywrightDriver.loadLocators("Locators/careerPage.properties");
-        PlaywrightDriver.loadLocators("Locators/scheduleMeetingPage.properties");
 
         // Init browser
         PlaywrightDriver.initDriver();

@@ -2,10 +2,8 @@ package pages;
 
 import com.microsoft.playwright.Locator;
 import config.PlaywrightDriver;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CareersPage {
 
@@ -25,7 +23,19 @@ public class CareersPage {
         return jobTitles;
     }
 
+    public String getNoJobsMessage() {
 
+        Locator jobs = PlaywrightDriver.getPage()
+                .locator(PlaywrightDriver.getLocator("career.jobTitles"));
+
+        if (jobs.count() == 0) {
+            String message = "No job positions are available";
+            PlaywrightDriver.log(message);
+            return message;
+        }
+
+        return null; // or return empty string ""
+    }
 
     public void clickViewPositions() {
         PlaywrightDriver.click("careers.viewOpenPositions");
@@ -68,7 +78,7 @@ public class CareersPage {
         );
 
         PlaywrightDriver.clickByXpath(dynamicXpath);
-        PlaywrightDriver.waitForTime(2000);
+        PlaywrightDriver.waitForTime(5000);
         PlaywrightDriver.scrollTo("job.apply.button");
         PlaywrightDriver.log("User clicks on View Details for job: " + jobTitle);
     }

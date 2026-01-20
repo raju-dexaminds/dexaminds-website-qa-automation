@@ -1,58 +1,51 @@
 package config;
-import com.aventstack.extentreports.Status;
-import io.cucumber.java.Scenario;
 import com.aventstack.extentreports.ExtentTest;
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.WaitForSelectorState;
-import utils.ExtentManager;
 
-import java.io.InputStream;
+
+import java.io.File;
+import java.io.FileInputStream;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import java.util.List;
 import java.util.Properties;
 
-import static config.Hooks.extent;
+
 
 public class PlaywrightDriver {
+
 
     private static Playwright playwright;
     private static Browser browser;
     private static BrowserContext context;
     private static Page page;
 
+
     private static ExtentTest extentTest;
 
     private static final Properties configProps = new Properties();
     private static final Properties locatorProps = new Properties();
 
+
     private static Throwable lastError;
 
+    public static void setLastError(Throwable error) {
+        lastError = error;
+    }
+
+    protected static Throwable getLastError() {
+        return lastError;
+    }
 
     // ================= CONFIG =================
 
-    public static void loadConfig(String filePath) {
-        try (InputStream is = PlaywrightDriver.class.getClassLoader().getResourceAsStream(filePath)) {
-            if (is != null) {
-                configProps.load(is);
-                System.out.println("✅ Loaded config: " + filePath);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to load config: " + filePath, e);
-        }
-    }
 
-    public static void loadLocators(String filePath) {
-        try (InputStream is = PlaywrightDriver.class.getClassLoader().getResourceAsStream(filePath)) {
-            if (is != null) {
-                locatorProps.load(is);
-                System.out.println("✅ Loaded locators: " + filePath);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to load locators: " + filePath, e);
-        }
-    }
+
+
 
     public static String getConfig(String key) {
         String value = configProps.getProperty(key);
@@ -62,22 +55,86 @@ public class PlaywrightDriver {
 
     public static String getLocator(String key) {
         String value = locatorProps.getProperty(key);
-        if (value == null) throw new RuntimeException("❌ Locator key not found: " + key);
-        return value;
+        if (value == null) {
+            throw new RuntimeException("❌ Locator key not found: " + key +
+                    "\nAvailable keys: " + locatorProps.keySet());
+        }
+        return value.trim();
     }
+
+    private static void loadProperties() {
+        try {
+            File directoryPath = new File(System.getProperty("user.dir") + "/src/test/resources/Locators");
+
+            if (!directoryPath.exists()) {
+                throw new RuntimeException("❌ Locators directory NOT found: " + directoryPath.getAbsolutePath());
+            }
+
+            File[] filesList = directoryPath.listFiles((dir, name) -> name.endsWith(".properties"));
+
+            if (filesList == null || filesList.length == 0) {
+                throw new RuntimeException("❌ No locator property files found in: " + directoryPath.getAbsolutePath());
+            }
+
+            for (File file : filesList) {
+                FileInputStream fis = new FileInputStream(file);
+                locatorProps.load(fis);
+                fis.close();
+                System.out.println("✅ Loaded locator file: " + file.getName());
+            }
+
+            System.out.println("✅ All locator properties loaded automatically");
+
+        } catch (Exception e) {
+            throw new RuntimeException("❌ Failed to load locator properties", e);
+        }
+    }
+    private static void loadAllConfigs() {
+        try {
+            File directoryPath = new File(System.getProperty("user.dir") + "/src/test/resources/config");
+
+            if (!directoryPath.exists()) {
+                throw new RuntimeException("❌ Config directory NOT found: " + directoryPath.getAbsolutePath());
+            }
+
+            File[] filesList = directoryPath.listFiles((dir, name) -> name.endsWith(".properties"));
+
+            if (filesList == null || filesList.length == 0) {
+                throw new RuntimeException("❌ No config property files found in: " + directoryPath.getAbsolutePath());
+            }
+
+            for (File file : filesList) {
+                try (FileInputStream fis = new FileInputStream(file)) {
+                    configProps.load(fis);
+                    System.out.println("✅ Loaded config: " + file.getName());
+                }
+            }
+
+            System.out.println("✅ All config files loaded automatically");
+
+        } catch (Exception e) {
+            throw new RuntimeException("❌ Failed to load config files", e);
+        }
+    }
+
+
 
     // ================= INIT =================
 
     // ================= INIT DRIVER =================
     public static void initDriver() {
+        // ✅ Load config files first
+        loadAllConfigs();
+
+        // ✅ Load locator properties
+        loadProperties();
 
         String browserName = getConfig("browser");
         boolean headless = Boolean.parseBoolean(getConfig("headless"));
 
         playwright = Playwright.create();
 
-        BrowserType.LaunchOptions options =
-                new BrowserType.LaunchOptions().setHeadless(headless);
+
 
         switch (browserName.toLowerCase()) {
 
@@ -113,6 +170,7 @@ public class PlaywrightDriver {
         }
 
         page = context.newPage();
+
     }
 
     public static Page getPage() {
@@ -133,34 +191,9 @@ public class PlaywrightDriver {
         loc.click();
         waitForTime(2000);
     }
-//    public static void click(String locatorKey) {
-//        log("🖱 Clicking: " + locatorKey);
-//        page.locator(getLocator(locatorKey)).click();
-//        sleep(2000);
-//    }
-    /* ---------- CLICKABLE CHECK ---------- */
-    public static boolean isClickable(String locator) {
-        try {
-            Locator element = getPage().locator(locator);
 
-            element.waitFor(new Locator.WaitForOptions()
-                    .setState(WaitForSelectorState.VISIBLE));
 
-            // Anchor must have href
-            String href = element.getAttribute("href");
-            return href != null && !href.isEmpty();
 
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-//    public static void clickDynamic(String xpath) {
-//        Locator loc = getPage().locator(xpath);
-//        loc.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-//        loc.click();
-//        waitForTime(1000);
-//    }
 
     public static void type(String locatorKey, String value) {
         Locator loc = getPage().locator(getLocator(locatorKey));
@@ -199,12 +232,7 @@ public class PlaywrightDriver {
         loc.scrollIntoViewIfNeeded();
     }
 
-//    public static void scrollAndClick(String locatorKey) {
-//        Locator loc = getPage().locator(getLocator(locatorKey));
-//        loc.scrollIntoViewIfNeeded();
-//        loc.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-//        loc.first().click();
-//    }
+
 
     public static void waitForTime(int millis) {
         getPage().waitForTimeout(millis);
@@ -216,10 +244,19 @@ public class PlaywrightDriver {
         Page newPage = getPage().context().waitForPage(() -> {
             click(locatorKey);
         });
-        page = newPage;
-        page.waitForLoadState();
-        log("🆕 Switched to new tab: " + page.url());
+
+        newPage.waitForLoadState();
+
+        // 🔥 IMPORTANT: update global page reference
+        setPage(newPage);
+
+        log("🆕 Switched to new tab: " + newPage.url());
     }
+
+    private static void setPage(Page newPage) {
+        page = newPage;
+    }
+
 
     // ================= CALENDAR =================
 
@@ -235,7 +272,7 @@ public class PlaywrightDriver {
 
             Locator header = getPage().locator(getLocator("booking.calendar.MonthYear"));
             Locator nextBtn = getPage().locator(getLocator("booking.NextBtn"));
-
+// Move to correct month/year
             for (int i = 0; i < 12; i++) {
                 String current = header.innerText().trim();
                 if (current.equalsIgnoreCase(expectedHeader)) break;
@@ -244,7 +281,8 @@ public class PlaywrightDriver {
             }
 
             String dayXpath = String.format(getLocator("booking.dateXpath"), day);
-            clickDynamic(dayXpath);
+            waitForTime(500);
+            clickByXpath(dayXpath);
 
             log("✅ Date selected: " + date);
 
@@ -254,51 +292,16 @@ public class PlaywrightDriver {
         }
     }
 
-    // ================= TIME SLOT =================
 
-    public static void TimeSlot(String time) {
-        try {
-            log("⏰ Selecting time slot: " + time);
 
-            String xpath = String.format(getLocator("booking.timeXpath"), time);
-            clickDynamic(xpath);
 
-            log("✅ Time slot selected: " + time);
-        } catch (Exception e) {
-            PlaywrightDriver.setLastError(e);
-            throw e;
-        }
-    }
-    public static void clickDynamic(String xpath) {
-        try {
-            Locator loc = getPage().locator(xpath).first();
 
-            // Wait until element exists in DOM
-            loc.waitFor(new Locator.WaitForOptions()
-                    .setState(WaitForSelectorState.ATTACHED));
 
-            // Scroll into view
-            loc.scrollIntoViewIfNeeded();
-
-            // Wait until visible
-            loc.waitFor(new Locator.WaitForOptions()
-                    .setState(WaitForSelectorState.VISIBLE));
-
-            loc.click();
-            waitForTime(1000);
-        }
-        catch (Exception e) {
-            PlaywrightDriver.setLastError(e);
-            throw e;
-        }
-    }
 
 
 
     public static void clickByXpath(String xpath) {
         Locator loc = getPage().locator(xpath);
-        loc.scrollIntoViewIfNeeded();
-        loc.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         loc.click();
     }
 
@@ -321,10 +324,6 @@ public class PlaywrightDriver {
 
 
     // ================= LOGGING =================
-
-    public static void setExtentTest(ExtentTest test) {
-        extentTest = test;
-    }
 
     public static void log(String message) {
         System.out.println(message);
@@ -381,12 +380,10 @@ public class PlaywrightDriver {
         try {
             String selector = getLocator(locatorKey);
 
-            String message = getPage().evaluate(
+            return getPage().evaluate(
                     "el => el.validationMessage",
                     getPage().querySelector(selector)
             ).toString();
-
-            return message;
 
         } catch (Exception e) {
             PlaywrightDriver.setLastError(e);
@@ -397,60 +394,32 @@ public class PlaywrightDriver {
 
 
 
-    public static String takeScreenshot(String name) {
-        try {
-            if (page == null) return null;
 
-            String path = ExtentManager.reportDir + "/screenshots/" + name + ".png";
-            page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get(path)));
-            return "screenshots/" + name + ".png"; // relative path
+    protected static void setExtentTest(ExtentTest test) {
+        extentTest=test;
+    }
+
+    public static void verifyText(String actual, String expected) {
+        try {
+            if (!actual.equals(expected)) {
+                String msg = "❌ Text verification failed. Expected: [" + expected + "] but found: [" + actual + "]";
+                log(msg);
+                throw new RuntimeException(msg);
+            } else {
+                log("✅ Text verified successfully: " + actual);
+            }
         } catch (Exception e) {
-            return null;
+            throw new RuntimeException("❌ Text verification error: " + e.getMessage());
+        }
+    }
+    public static void verifyTrue(boolean condition) {
+        if (!condition) {
+            throw new RuntimeException("❌ Condition is FALSE");
+        } else {
+            log("✅ Condition satisfied");
         }
     }
 
-
-
-
-    public static void logFailure(Throwable error) {
-        try {
-            if (error == null) {
-                extentTest.fail("❌ Scenario failed (no exception captured)");
-                return;
-            }
-
-            extentTest.fail("❌ Failure Reason: " + error.getMessage());
-
-            // Full stacktrace
-            StringBuilder sb = new StringBuilder();
-            for (StackTraceElement el : error.getStackTrace()) {
-                sb.append(el.toString()).append("<br>");
-            }
-
-            extentTest.fail(sb.toString());
-
-            // Screenshot
-            String screenshotPath = takeScreenshot("Failure_" + System.currentTimeMillis());
-            if (screenshotPath != null) {
-                extentTest.addScreenCaptureFromPath(screenshotPath);
-            }
-
-        } catch (Exception e) {
-            setLastError(e);
-            throw e;
-        }
-    }
-
-
-
-
-    public static void setLastError(Throwable e) {
-        lastError = e;
-    }
-
-    public static Throwable getLastError() {
-        return lastError;
-    }
 
 }
 

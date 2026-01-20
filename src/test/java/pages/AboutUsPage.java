@@ -8,40 +8,6 @@ public class AboutUsPage {
         PlaywrightDriver.click("about.link");
     }
 
-    public boolean isHeadingVisible() {
-        return PlaywrightDriver.isVisible(
-                PlaywrightDriver.getLocator("about.heading"));
-    }
-
-    public boolean isDescriptionVisible() {
-        return PlaywrightDriver.isVisible(
-                PlaywrightDriver.getLocator("about.description"));
-    }
-
-    public boolean isMissionVisible() {
-        return PlaywrightDriver.isVisible(
-                PlaywrightDriver.getLocator("about.mission"));
-    }
-
-    public boolean hasImages() {
-        return PlaywrightDriver.getPage()
-                .locator(PlaywrightDriver.getLocator("about.images"))
-                .count() > 0;
-    }
-
-    public boolean isPageBlank() {
-        return PlaywrightDriver.getPage().content().length() < 200;
-    }
-    // ================= NAVIGATION =================
-
-    public void clickAboutUsLink() {
-        PlaywrightDriver.click("aboutus.link");
-    }
-
-    public boolean isAboutUsPageOpened() {
-        return PlaywrightDriver.getPage().url().contains("/about");
-    }
-
     // ================= TITLE & URL =================
 
     public String getAboutUsPageTitle() {
@@ -74,28 +40,14 @@ public class AboutUsPage {
         PlaywrightDriver.click("about.home.link");
     }
 
-    public boolean isHomePageDisplayed() {
-        return !PlaywrightDriver.getPage().url().contains("/about");
-    }
+
 
     public String getHomePageTitle() {
         return PlaywrightDriver.getTitle();
     }
 
 
-    // ================= NEGATIVE VALIDATIONS =================
 
-
-
-//    public boolean hasEmptyContentBlocks() {
-//        return PlaywrightDriver.getPage()
-//                .locator(PlaywrightDriver.getLocator("aboutus.empty.blocks"))
-//                .count() > 0;
-//    }
-//
-//    public boolean isErrorMessageDisplayed() {
-//        return PlaywrightDriver.isVisible("aboutus.error.message");
-//    }
 
 
 }

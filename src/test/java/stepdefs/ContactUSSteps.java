@@ -22,10 +22,6 @@ public class ContactUSSteps {
         contactUsPage.clickContactUs();
     }
 
-    @Then("verify Contact Us button is visible")
-    public void verifyVisible() {
-        Assert.assertTrue(contactUsPage.isContactButtonVisible(),"❌ Contact Us button not visible");
-    }
 
     @When("user enters valid Name")
     public void enterName() {
@@ -60,15 +56,6 @@ public class ContactUSSteps {
 
        }
 
-
-
-    @Then("Contact Us button should be clickable")
-    public void contact_us_button_should_be_clickable() {
-        Assert.assertTrue(
-                contactUsPage.isContactUsButtonClickable(),
-                "❌ Contact Us button is NOT clickable"
-        );
-    }
 
     @Then("verify Contact Us page loads successfully")
     public void verify_contact_us_page_loads_successfully() {

@@ -22,8 +22,6 @@ Feature: About Us Page UI and Content Validation
   Scenario: Verify mission and vision section is visible
     Then verify mission and vision section are visible
 
-
-
   @positive
   Scenario: Verify navigation back to Home page from About Us
     When user clicks on Home link
