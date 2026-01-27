@@ -13,13 +13,13 @@ public class JobApplicationPage {
 
 
     public void clickApplyJob() {
-            PlaywrightDriver.click("job.apply.button");
-            PlaywrightDriver.log("User clicks on Apply Job button");
-            PlaywrightDriver.scrollTo("job.submit");
+        PlaywrightDriver.click("job.apply.button");
+        PlaywrightDriver.log("User clicks on Apply Job button");
+        PlaywrightDriver.scrollTo("job.submit");
 
-        }
+    }
 
-        public void submitApplication() {
+    public void submitApplication() {
         PlaywrightDriver.click("job.submit");
         PlaywrightDriver.log("User submits the job application");
         PlaywrightDriver.waitForTime(15000);

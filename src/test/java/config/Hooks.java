@@ -4,7 +4,6 @@ import com.aventstack.extentreports.*;
 import com.microsoft.playwright.Page;
 import io.cucumber.java.*;
 import utils.ExtentManager;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,10 +22,6 @@ public class Hooks {
         // Init browser
         PlaywrightDriver.initDriver();
 
-        // Navigate to base URL
-        PlaywrightDriver.navigateTo(
-                PlaywrightDriver.getConfig("loginUrl")
-        );
 
         // Init Extent
         extent = ExtentManager.getExtent();
@@ -38,6 +33,7 @@ public class Hooks {
         // Logs
         PlaywrightDriver.log("🚀 Scenario Started: " + scenario.getName());
     }
+
     @AfterStep
     public void afterStep(Scenario scenario) throws IOException {
         try {
@@ -66,7 +62,7 @@ public class Hooks {
                         .addScreenCaptureFromPath(relativePath);
             }
 
-        }  catch (Exception e) {
+        } catch (Exception e) {
             PlaywrightDriver.setLastError(e);
             throw e;
         }
@@ -77,12 +73,7 @@ public class Hooks {
         if (scenario.isFailed()) {
             Throwable error = PlaywrightDriver.getLastError();
 
-            if (error != null) {
-                test.fail("❌ " + error.getMessage());
-                test.fail(error);
-            } else {
-                test.fail("❌ Scenario failed (no exception captured)");
-            }
+            PlaywrightDriver.logFailure(error);
         } else {
             test.pass("✅ Scenario Passed");
         }

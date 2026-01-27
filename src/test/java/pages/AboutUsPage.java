@@ -33,7 +33,6 @@ public class AboutUsPage {
     }
 
 
-
     // ================= NAVIGATION BACK =================
 
     public void clickHomeLink() {
@@ -41,13 +40,9 @@ public class AboutUsPage {
     }
 
 
-
     public String getHomePageTitle() {
         return PlaywrightDriver.getTitle();
     }
-
-
-
 
 
 }

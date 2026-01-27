@@ -7,20 +7,12 @@ public class ContactUsPage {
     public void clickContactUs() {
         PlaywrightDriver.click("contact.button");
     }
-
-
-
-
-
     public void clickSend() {
         PlaywrightDriver.log("Clicking Send button");
         PlaywrightDriver.click(
                 "contact.send");
         PlaywrightDriver.log("Clicked Send button");
     }
-
-
-    // ================= FIELD VISIBILITY =================
 
     public boolean isNameFieldVisibleAndEnabled() {
         return PlaywrightDriver.isVisible("contact.name");
@@ -38,9 +30,6 @@ public class ContactUsPage {
         return PlaywrightDriver.isVisible("contact.send");
     }
 
-
-    // ================= FORM INPUT =================
-
     public void enterName(String name) {
         PlaywrightDriver.type("contact.name", name);
     }
@@ -53,13 +42,9 @@ public class ContactUsPage {
         PlaywrightDriver.type("contact.message", message);
     }
 
-
-    // ================= VALIDATIONS =================
-
     public String getSuccessMessageDisplayed() {
         return PlaywrightDriver.getText(("contact.success"));
     }
-
 
 
     public String getErrorMessageInvalidatorName() {
@@ -76,11 +61,9 @@ public class ContactUsPage {
     }
 
 
-
-
     public boolean isContactUsPageOpened() {
 
-         return PlaywrightDriver.isVisible("contact.name");
+        return PlaywrightDriver.isVisible("contact.name");
     }
 
     public String getErrorMessageInvalidatorMessage() {

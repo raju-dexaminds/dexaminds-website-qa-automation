@@ -27,12 +27,12 @@ Feature: Careers – Job Positions Verification and Application
     And user clicks on View Details for "<JobTitle>"
     Then Job Details page should load successfully
     Examples:
-      | JobTitle                   |
+      | JobTitle                    |
       | Senior Full Stack Developer |
-      | ReactJS Developer          |
-      | DevOps Engineer            |
-      | UI/UX Designer             |
-      | AI/ML Engineer             |
+      | ReactJS Developer           |
+      | DevOps Engineer             |
+      | UI/UX Designer              |
+      | AI/ML Engineer              |
 
   @Positive
   Scenario Outline: Submit Job Application for specific job position
@@ -45,8 +45,8 @@ Feature: Careers – Job Positions Verification and Application
     Then Job Application confirmation message "Thank you for your application! We'll get back to you soon." should be displayed
 
     Examples:
-      | JobTitle                    | ResumeFile       |
-      | DevOps Engineer             | Resume.pdf       |
+      | JobTitle        | ResumeFile |
+      | DevOps Engineer | Resume.pdf |
 
   @Negative
   Scenario Outline: Upload invalid resume format for specific job
@@ -57,9 +57,9 @@ Feature: Careers – Job Positions Verification and Application
     Then error message "Invalid file type. Only PDF and Word documents are allowed" should be displayed for invalid resume
 
     Examples:
-      | JobTitle                    | ResumeFile   |
-      | Senior Full Stack Developer | resume.png   |
-      | AI/ML Engineer              | datatable.txt|
+      | JobTitle                    | ResumeFile    |
+      | Senior Full Stack Developer | resume.png    |
+      | AI/ML Engineer              | datatable.txt |
 
   @Negative
   Scenario Outline: Upload resume exceeding size limit for specific job
@@ -69,8 +69,8 @@ Feature: Careers – Job Positions Verification and Application
     And user uploads resume "<ResumeFile>"
     Then error message "File size exceeds 5MB limit" should be displayed for resume size limit
     Examples:
-      | JobTitle                    | ResumeFile       |
-      | ReactJS Developer           | 10mb.docx|
+      | JobTitle          | ResumeFile |
+      | ReactJS Developer | 10mb.docx  |
 
 
   @Negative

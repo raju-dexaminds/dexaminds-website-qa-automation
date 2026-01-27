@@ -2,6 +2,7 @@ package pages;
 
 import com.microsoft.playwright.Locator;
 import config.PlaywrightDriver;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,8 +48,6 @@ public class CareersPage {
     }
 
 
-
-
     public boolean isViewPositionsButtonVisible() {
         return PlaywrightDriver.isVisible("careers.viewOpenPositions");
 
@@ -71,6 +70,7 @@ public class CareersPage {
         PlaywrightDriver.log("User clicks on Careers link");
 
     }
+
     public void clickViewDetailsForJob(String jobTitle) {
         String dynamicXpath = PlaywrightDriver.getDynamicLocator(
                 "career.viewDetails.byJob",

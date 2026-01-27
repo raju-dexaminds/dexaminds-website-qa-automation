@@ -2,6 +2,7 @@ package pages;
 
 import com.microsoft.playwright.Locator;
 import config.PlaywrightDriver;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +20,6 @@ public class ScheduleMeetingPage {
     public void clickScheduleMeetingAndSwitchTab() {
         PlaywrightDriver.switchToNewTabAfterClick("contact.scheduleMeetingBtn");
     }
-
-
     public void enterName(String name) {
         PlaywrightDriver.log("Entering name");
         PlaywrightDriver.type("booking.name", name);
@@ -50,16 +49,14 @@ public class ScheduleMeetingPage {
         PlaywrightDriver.log("Clicking Book button");
         PlaywrightDriver.click("booking.bookBtn");
     }
-
-
     public void selectDate(String date) {
         PlaywrightDriver.log("📅 Selecting date: " + date);
         PlaywrightDriver.waitForTime(15000);
         PlaywrightDriver.selectDateFromCalendar(date);
 
     }
-    public  void smartSelectSlot(String preferredSlot) {
-        List<String> slots =getAvailableTimeSlots();
+    public void smartSelectSlot(String preferredSlot) {
+        List<String> slots = getAvailableTimeSlots();
 
         if (slots.isEmpty()) {
             throw new RuntimeException("No available slots for this date");
@@ -88,7 +85,7 @@ public class ScheduleMeetingPage {
             throw e;
         }
     }
-    public  String selectAnyAvailableSlot() {
+    public String selectAnyAvailableSlot() {
         List<String> slots = getAvailableTimeSlots();
 
         if (slots.isEmpty()) {
@@ -100,7 +97,7 @@ public class ScheduleMeetingPage {
         return selected;
     }
 
-    public  List<String> getAvailableTimeSlots() {
+    public List<String> getAvailableTimeSlots() {
         List<String> slots = new ArrayList<>();
         Locator slotElements = PlaywrightDriver.getPage().locator(PlaywrightDriver.getLocator("booking.availableSlots"));
 
@@ -109,11 +106,9 @@ public class ScheduleMeetingPage {
             String time = slotElements.nth(i).innerText().trim();
             slots.add(time);
         }
-        PlaywrightDriver.log("Available slots are "+slots );
+        PlaywrightDriver.log("Available slots are " + slots);
         return slots;
     }
-
-
     public boolean isMessageforInvalidEmaill() {
         return PlaywrightDriver.isVisible(("booking.InvalidEmail"));
     }
@@ -124,9 +119,5 @@ public class ScheduleMeetingPage {
 
     public String getMessageforBookingSuccess() {
         return PlaywrightDriver.getText("booking.successMsg");
-    }
-
-    public String getMessageforUnavailableSlots() {
-        return PlaywrightDriver.getText("booking.UnavailableSlotsMsg");
     }
 }

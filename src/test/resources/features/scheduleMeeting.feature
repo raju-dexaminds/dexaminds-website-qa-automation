@@ -37,7 +37,6 @@ Feature: Schedule a Meeting from Contact Page
     And user clicks on Book button
     Then booking confirmation message "Thank you for booking with us! You will get a confirmation message in email shortly" should be displayed
 
-
   @Negative
   Scenario: Verify that when a user selects an already booked time slot, the system automatically books the next available time slot.
     When user clicks on Schedule a Meeting
@@ -50,8 +49,6 @@ Feature: Schedule a Meeting from Contact Page
     And user enters special request ""
     And user clicks on Book button
     Then booking confirmation message "Thank you for booking with us! You will get a confirmation message in email shortly" should be displayed
-
-
 
   @Negative
   Scenario: Submit booking without name

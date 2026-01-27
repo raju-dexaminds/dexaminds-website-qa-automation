@@ -1,20 +1,17 @@
 package config;
+
 import com.aventstack.extentreports.ExtentTest;
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.WaitForSelectorState;
-
+import utils.ExtentManager;
 
 import java.io.File;
 import java.io.FileInputStream;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import java.util.List;
 import java.util.Properties;
-
-
 
 public class PlaywrightDriver {
 
@@ -23,14 +20,9 @@ public class PlaywrightDriver {
     private static Browser browser;
     private static BrowserContext context;
     private static Page page;
-
-
     private static ExtentTest extentTest;
-
     private static final Properties configProps = new Properties();
     private static final Properties locatorProps = new Properties();
-
-
     private static Throwable lastError;
 
     public static void setLastError(Throwable error) {
@@ -40,12 +32,6 @@ public class PlaywrightDriver {
     protected static Throwable getLastError() {
         return lastError;
     }
-
-    // ================= CONFIG =================
-
-
-
-
 
     public static String getConfig(String key) {
         String value = configProps.getProperty(key);
@@ -89,6 +75,7 @@ public class PlaywrightDriver {
             throw new RuntimeException("❌ Failed to load locator properties", e);
         }
     }
+
     private static void loadAllConfigs() {
         try {
             File directoryPath = new File(System.getProperty("user.dir") + "/src/test/resources/config");
@@ -117,11 +104,6 @@ public class PlaywrightDriver {
         }
     }
 
-
-
-    // ================= INIT =================
-
-    // ================= INIT DRIVER =================
     public static void initDriver() {
         // ✅ Load config files first
         loadAllConfigs();
@@ -133,7 +115,6 @@ public class PlaywrightDriver {
         boolean headless = Boolean.parseBoolean(getConfig("headless"));
 
         playwright = Playwright.create();
-
 
 
         switch (browserName.toLowerCase()) {
@@ -187,12 +168,10 @@ public class PlaywrightDriver {
 
     public static void click(String locatorKey) {
         Locator loc = getPage().locator(getLocator(locatorKey));
-       loc.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        loc.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         loc.click();
         waitForTime(2000);
     }
-
-
 
 
     public static void type(String locatorKey, String value) {
@@ -223,7 +202,7 @@ public class PlaywrightDriver {
         // 4️⃣ Wait until visible
         element.waitFor(new Locator.WaitForOptions()
                 .setState(WaitForSelectorState.VISIBLE));
-     PlaywrightDriver.waitForTime(10000);
+        PlaywrightDriver.waitForTime(10000);
         return element.isVisible();
     }
 
@@ -233,12 +212,9 @@ public class PlaywrightDriver {
     }
 
 
-
     public static void waitForTime(int millis) {
         getPage().waitForTimeout(millis);
     }
-
-    // ================= NEW TAB =================
 
     public static void switchToNewTabAfterClick(String locatorKey) {
         Page newPage = getPage().context().waitForPage(() -> {
@@ -272,7 +248,7 @@ public class PlaywrightDriver {
 
             Locator header = getPage().locator(getLocator("booking.calendar.MonthYear"));
             Locator nextBtn = getPage().locator(getLocator("booking.NextBtn"));
-// Move to correct month/year
+               // Move to correct month/year
             for (int i = 0; i < 12; i++) {
                 String current = header.innerText().trim();
                 if (current.equalsIgnoreCase(expectedHeader)) break;
@@ -293,19 +269,10 @@ public class PlaywrightDriver {
     }
 
 
-
-
-
-
-
-
-
     public static void clickByXpath(String xpath) {
         Locator loc = getPage().locator(xpath);
         loc.click();
     }
-
-    // ================= FILE UPLOAD =================
 
     public static void uploadResume(String locatorKey, String fileName) {
 
@@ -321,16 +288,10 @@ public class PlaywrightDriver {
         getPage().setInputFiles(getLocator(locatorKey), filePath);
     }
 
-
-
-    // ================= LOGGING =================
-
     public static void log(String message) {
         System.out.println(message);
         if (extentTest != null) extentTest.info(message);
     }
-
-    // ================= CLEANUP =================
 
     public static void tearDown() {
         if (playwright != null) {
@@ -341,8 +302,6 @@ public class PlaywrightDriver {
             page = null;
         }
     }
-
-    // ================= UTIL =================
 
     private static String getMonthName(int month) {
         return switch (month) {
@@ -367,15 +326,16 @@ public class PlaywrightDriver {
     }
 
 
-        public static String getDynamicLocator(String key, String value) {
-            String locatorTemplate = locatorProps.getProperty(key);
+    public static String getDynamicLocator(String key, String value) {
+        String locatorTemplate = locatorProps.getProperty(key);
 
-            if (locatorTemplate == null) {
-                throw new RuntimeException("❌ Dynamic locator key NOT FOUND: " + key);
-            }
-
-            return String.format(locatorTemplate, value);
+        if (locatorTemplate == null) {
+            throw new RuntimeException("❌ Dynamic locator key NOT FOUND: " + key);
         }
+
+        return String.format(locatorTemplate, value);
+    }
+
     public static String getValidationMessage(String locatorKey) {
         try {
             String selector = getLocator(locatorKey);
@@ -392,11 +352,8 @@ public class PlaywrightDriver {
     }
 
 
-
-
-
     protected static void setExtentTest(ExtentTest test) {
-        extentTest=test;
+        extentTest = test;
     }
 
     public static void verifyText(String actual, String expected) {
@@ -412,11 +369,54 @@ public class PlaywrightDriver {
             throw new RuntimeException("❌ Text verification error: " + e.getMessage());
         }
     }
+
     public static void verifyTrue(boolean condition) {
         if (!condition) {
             throw new RuntimeException("❌ Condition is FALSE");
         } else {
             log("✅ Condition satisfied");
+        }
+    }
+
+
+    public static void logFailure(Throwable error) {
+        try {
+            if (error == null) {
+                extentTest.fail("❌ Scenario failed (no exception captured)");
+                return;
+            }
+
+            extentTest.fail("❌ Failure Reason: " + error.getMessage());
+
+            // Full stacktrace
+            StringBuilder sb = new StringBuilder();
+            for (StackTraceElement el : error.getStackTrace()) {
+                sb.append(el.toString()).append("<br>");
+            }
+
+            extentTest.fail(sb.toString());
+
+            // Screenshot
+            String screenshotPath = takeScreenshot("Failure_" + System.currentTimeMillis());
+            if (screenshotPath != null) {
+                extentTest.addScreenCaptureFromPath(screenshotPath);
+            }
+
+        } catch (Exception e) {
+            setLastError(e);
+            throw e;
+        }
+    }
+
+    public static String takeScreenshot(String name) {
+        try {
+            if (page == null) return null;
+
+            String path = ExtentManager.reportDir + "/screenshots/" + name + ".png";
+            page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get(path)));
+            return "screenshots/" + name + ".png"; // relative path
+        } catch (Exception e) {
+            return null;
         }
     }
 

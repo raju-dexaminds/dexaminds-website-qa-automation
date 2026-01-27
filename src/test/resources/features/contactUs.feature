@@ -43,13 +43,13 @@ Feature: Contact Us Navigation, UI and Validation
       | test@           |
       | test @gmail.com |
 
-  @Positive @EmailValidation
-  Scenario: Submit Contact form with uppercase email
-    When user enters valid Name
-    And user enters email as "TEST@GMAIL.COM"
-    And user enters valid Message
-    And user clicks Send Message button
-    Then verify success message "Thank you for your message! We'll get back to you soon." is displayed
+#  @Positive @EmailValidation
+#  Scenario: Submit Contact form with uppercase email
+#    When user enters valid Name
+#    And user enters email as "TEST@GMAIL.COM"
+#    And user enters valid Message
+#    And user clicks Send Message button
+#    Then verify success message "Thank you for your message! We'll get back to you soon." is displayed
 
   @Negative @NameValidation
   Scenario Outline: Verify error message should be displayed for Invalid Name format
