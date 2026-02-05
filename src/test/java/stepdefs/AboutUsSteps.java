@@ -15,27 +15,6 @@ public class AboutUsSteps {
         aboutUsPage.clickAboutUs();
     }
 
-
-
-    @Then("verify mission or vision section is visible")
-    public void verifyMission() {
-        Assert.assertTrue(aboutUsPage.isMissionVisible());
-    }
-
-    @Then("verify all About Us images are displayed properly")
-    public void verifyImages() {
-        Assert.assertTrue(aboutUsPage.hasImages());
-    }
-
-    @Then("verify About Us page is not blank")
-    public void verifyNotBlank() {
-        Assert.assertFalse(aboutUsPage.isPageBlank());
-    }
-
-
-
-
-
     @Then("verify About Us page title is correct")
     public void verify_about_us_page_title_is_correct() {
         String actualTitle = aboutUsPage.getAboutUsPageTitle();

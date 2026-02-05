@@ -1,8 +1,10 @@
 package pages;
 
-import com.microsoft.playwright.Frame;
+import com.microsoft.playwright.Locator;
 import config.PlaywrightDriver;
 
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ScheduleMeetingPage {
@@ -11,36 +13,13 @@ public class ScheduleMeetingPage {
         return PlaywrightDriver.isVisible("contact.scheduleMeetingBtn");
     }
 
-
-
-    public boolean isBookingPageOpened() {
-        return PlaywrightDriver.isVisible("booking.page.container");
-    }
-
     public String getCurrentURL() {
         return PlaywrightDriver.getPage().url();
     }
 
-    public boolean areSlotsVisible() {
-        return PlaywrightDriver.isVisible("booking.availableSlots");
-    }
-
-
-    public void confirmBooking() {
-        PlaywrightDriver.click("booking.confirmBtn");
-    }
-
-    public boolean isBookingSuccess() {
-        return PlaywrightDriver.isVisible("booking.successMsg");
-    }
-
-
-
     public void clickScheduleMeetingAndSwitchTab() {
         PlaywrightDriver.switchToNewTabAfterClick("contact.scheduleMeetingBtn");
     }
-
-
     public void enterName(String name) {
         PlaywrightDriver.log("Entering name");
         PlaywrightDriver.type("booking.name", name);
@@ -70,16 +49,66 @@ public class ScheduleMeetingPage {
         PlaywrightDriver.log("Clicking Book button");
         PlaywrightDriver.click("booking.bookBtn");
     }
-
-
     public void selectDate(String date) {
+        PlaywrightDriver.log("📅 Selecting date: " + date);
+        PlaywrightDriver.waitForTime(15000);
         PlaywrightDriver.selectDateFromCalendar(date);
+
+    }
+    public void smartSelectSlot(String preferredSlot) {
+        List<String> slots = getAvailableTimeSlots();
+
+        if (slots.isEmpty()) {
+            throw new RuntimeException("No available slots for this date");
+        }
+
+        if (slots.contains(preferredSlot)) {
+            selectTimeSlot(preferredSlot);
+            return;
+        }
+
+        // Pick another available slot
+        String fallback = slots.get(0);
+        selectTimeSlot(fallback);
+        PlaywrightDriver.log("⚠ Preferred slot not available. Selected: " + fallback);
+    }
+    public static void selectTimeSlot(String time) {
+        try {
+            PlaywrightDriver.log("⏰ Selecting time slot: " + time);
+
+            String xpath = String.format(PlaywrightDriver.getLocator("booking.timeXpath"), time);
+            PlaywrightDriver.clickByXpath(xpath);
+
+            PlaywrightDriver.log("✅ Time slot selected: " + time);
+        } catch (Exception e) {
+            PlaywrightDriver.setLastError(e);
+            throw e;
+        }
+    }
+    public String selectAnyAvailableSlot() {
+        List<String> slots = getAvailableTimeSlots();
+
+        if (slots.isEmpty()) {
+            throw new RuntimeException("No available slots");
+        }
+
+        String selected = slots.get(0);
+        selectTimeSlot(selected);
+        return selected;
     }
 
-    public void selectTimeSlot(String time) {
-        PlaywrightDriver.TimeSlot(time);
-    }
+    public List<String> getAvailableTimeSlots() {
+        List<String> slots = new ArrayList<>();
+        Locator slotElements = PlaywrightDriver.getPage().locator(PlaywrightDriver.getLocator("booking.availableSlots"));
 
+        int count = slotElements.count();
+        for (int i = 0; i < count; i++) {
+            String time = slotElements.nth(i).innerText().trim();
+            slots.add(time);
+        }
+        PlaywrightDriver.log("Available slots are " + slots);
+        return slots;
+    }
     public boolean isMessageforInvalidEmaill() {
         return PlaywrightDriver.isVisible(("booking.InvalidEmail"));
     }

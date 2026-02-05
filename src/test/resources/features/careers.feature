@@ -5,10 +5,6 @@ Feature: Careers – Job Positions Verification and Application
     Given user navigates to homePage_url
     Given user clicks on Careers link
 
-  # -------------------------------------------
-  # Careers Page Validation
-  # -------------------------------------------
-
   @Positive
   Scenario: Verify Careers page loads successfully
     Then verify Careers page URL is correct
@@ -20,40 +16,23 @@ Feature: Careers – Job Positions Verification and Application
     Then Open Positions section should be visible
     And available job positions should be displayed
 
-  # -------------------------------------------
-  # Job Positions Verification
-  # -------------------------------------------
-
   @Positive
   Scenario: Verify all expected job positions are displayed
     When user clicks on View Positions
-    Then should display available job positions
-
-
-
-
-  # -------------------------------------------
-  # Job Details Page Validation
-  # -------------------------------------------
+    Then should return available job positions
 
   @Positive
   Scenario Outline: Verify Job Details page opens for specific job
     When user clicks on View Positions
     And user clicks on View Details for "<JobTitle>"
     Then Job Details page should load successfully
-
-
     Examples:
-      | JobTitle                   |
+      | JobTitle                    |
       | Senior Full Stack Developer |
-      | ReactJS Developer          |
-      | DevOps Engineer            |
-      | UI/UX Designer             |
-      | AI/ML Engineer             |
-
-  # -------------------------------------------
-  # Job Application – Positive Flow
-  # -------------------------------------------
+      | ReactJS Developer           |
+      | DevOps Engineer             |
+      | UI/UX Designer              |
+      | AI/ML Engineer              |
 
   @Positive
   Scenario Outline: Submit Job Application for specific job position
@@ -66,14 +45,8 @@ Feature: Careers – Job Positions Verification and Application
     Then Job Application confirmation message "Thank you for your application! We'll get back to you soon." should be displayed
 
     Examples:
-      | JobTitle                    | ResumeFile       |
-      | DevOps Engineer             | Resume.pdf       |
-#      | ReactJS Developer           | large_resume.docx|
-
-  # -------------------------------------------
-  # Job Application – Negative Scenarios
-  # -------------------------------------------
-
+      | JobTitle        | ResumeFile |
+      | DevOps Engineer | Resume.pdf |
 
   @Negative
   Scenario Outline: Upload invalid resume format for specific job
@@ -84,13 +57,9 @@ Feature: Careers – Job Positions Verification and Application
     Then error message "Invalid file type. Only PDF and Word documents are allowed" should be displayed for invalid resume
 
     Examples:
-      | JobTitle                    | ResumeFile   |
-      | Senior Full Stack Developer | resume.png   |
-#      | ReactJS Developer           | resume.jpg   |
-#      | DevOps Engineer             | resume.zip   |
-#      | UI/UX Designer              | resume.exe   |
-      | AI/ML Engineer              | datatable.txt   |
-
+      | JobTitle                    | ResumeFile    |
+      | Senior Full Stack Developer | resume.png    |
+      | AI/ML Engineer              | datatable.txt |
 
   @Negative
   Scenario Outline: Upload resume exceeding size limit for specific job
@@ -100,8 +69,12 @@ Feature: Careers – Job Positions Verification and Application
     And user uploads resume "<ResumeFile>"
     Then error message "File size exceeds 5MB limit" should be displayed for resume size limit
     Examples:
-      | JobTitle                    | ResumeFile       |
-      | ReactJS Developer           | 10mb.docx|
-#      | Senior Full Stack Developer | large_resume.pdf |
+      | JobTitle          | ResumeFile |
+      | ReactJS Developer | 10mb.docx  |
 
+
+  @Negative
+  Scenario: Verify message when no job positions are available
+    When user clicks on View Positions
+    Then system should display "No job positions are available" message
 

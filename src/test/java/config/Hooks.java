@@ -4,7 +4,6 @@ import com.aventstack.extentreports.*;
 import com.microsoft.playwright.Page;
 import io.cucumber.java.*;
 import utils.ExtentManager;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,24 +17,11 @@ public class Hooks {
 
     @Before
     public void beforeScenario(Scenario scenario) {
-        // Load configs safely
-        PlaywrightDriver.loadConfig("config/aboutUs.properties");
-        PlaywrightDriver.loadConfig("config/contactUs.properties");
-        PlaywrightDriver.loadConfig("config/careers.properties");
 
-        // Load locators safely
-        PlaywrightDriver.loadLocators("Locators/aboutUsPage.properties");
-        PlaywrightDriver.loadLocators("Locators/contactUsPage.properties");
-        PlaywrightDriver.loadLocators("Locators/careerPage.properties");
-        PlaywrightDriver.loadLocators("Locators/scheduleMeetingPage.properties");
 
         // Init browser
         PlaywrightDriver.initDriver();
 
-        // Navigate to base URL
-        PlaywrightDriver.navigateTo(
-                PlaywrightDriver.getConfig("loginUrl")
-        );
 
         // Init Extent
         extent = ExtentManager.getExtent();
@@ -47,6 +33,7 @@ public class Hooks {
         // Logs
         PlaywrightDriver.log("🚀 Scenario Started: " + scenario.getName());
     }
+
     @AfterStep
     public void afterStep(Scenario scenario) throws IOException {
         try {
@@ -75,7 +62,7 @@ public class Hooks {
                         .addScreenCaptureFromPath(relativePath);
             }
 
-        }  catch (Exception e) {
+        } catch (Exception e) {
             PlaywrightDriver.setLastError(e);
             throw e;
         }
@@ -86,12 +73,7 @@ public class Hooks {
         if (scenario.isFailed()) {
             Throwable error = PlaywrightDriver.getLastError();
 
-            if (error != null) {
-                test.fail("❌ " + error.getMessage());
-                test.fail(error);
-            } else {
-                test.fail("❌ Scenario failed (no exception captured)");
-            }
+            PlaywrightDriver.logFailure(error);
         } else {
             test.pass("✅ Scenario Passed");
         }
